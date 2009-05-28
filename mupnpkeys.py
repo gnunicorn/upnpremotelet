@@ -52,10 +52,12 @@ class MediaRendererClient(log.Loggable):
         pass
 
 if __name__ == '__main__':
+    """
     import sys
     if len(sys.argv) < 2:
         print "%s UID_OF_DEVICE" % sys.argv[0]
         sys.exit(1)
+    """
 
     from twisted.internet import reactor
     from twisted.internet import task
@@ -73,12 +75,11 @@ if __name__ == '__main__':
 
     #uid = sys.argv[0]
     def found_one(device=None, udn=None):
-        if device:
-            client.connect(device)
-        elif udn:
-            client.connect(coherence.get_device_with_id(udn))
-        else:
-            return
+        if not device:
+            device = coherence.get_device_with_id(udn)
+
+        print "connecting to %s" % device.get_friendly_name()
+        client.connect(device)
 
         from mmkeys import Mmkeys
         keyer = Mmkeys(client)

@@ -11,13 +11,12 @@ import dbus
 from logging import getLogger
 log = getLogger('mmkeys')
 
-class Mmkeys(object):
+class MMKeysController(object):
 
-    def __init__(self, controller, name="Mmmmkey"):
+    def __init__(self, name="Mmmmkey"):
         self.name = name
-        self.controller = controller
+        self.controller = None
         self.bus = dbus.SessionBus()
-
         self.bus_object = self.bus.get_object('org.gnome.SettingsDaemon',
                 '/org/gnome/SettingsDaemon/MediaKeys')
 
@@ -26,10 +25,14 @@ class Mmkeys(object):
                 dbus_interface='org.gnome.SettingsDaemon.MediaKeys')
         self.iface = dbus.Interface(self.bus_object,
                 'org.gnome.SettingsDaemon.MediaKeys')
+
+    def connect(self, device):
+        self.controller = device
         self.iface.GrabMediaPlayerKeys(self.name, 0)
 
-    def stop(self):
+    def disconnect(self):
         self.iface.ReleaseMediaPlayerKeys(self.name)
+        self.controller = None
 
     def _key_pressed(self, application, key):
         log.debug("received: %s, %s" % (application, key))

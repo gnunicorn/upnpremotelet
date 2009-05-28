@@ -17,7 +17,8 @@ class StatusIconController(object):
         self.menu.show_all()
         self.menu.popup(None, None, None, 3, time)
 
-    def __init__(self):
+    def __init__(self, app):
+        self.app = app
         self.status_icon = gtk.StatusIcon()
         self.status_icon.set_from_stock(gtk.STOCK_ABOUT)
         self.status_icon.connect('popup-menu', self.show_options)
@@ -33,7 +34,9 @@ class StatusIconController(object):
         assert self.controller is None
         assert controller
         self.controller = controller
-        self._sensitive_menu(True)
+
+    def _connection_state_changed(self, state):
+        self._sensitive_menu(state)
 
     def _sensitive_menu(self, val):
         self.item_play.set_sensitive(val)
@@ -43,7 +46,6 @@ class StatusIconController(object):
 
     def disconnect(self):
         self.controller = None
-        self._sensitive_menu(False)
 
     def _set_playing_status(self, playing):
         if playing != self.playing:

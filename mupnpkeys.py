@@ -70,6 +70,9 @@ if __name__ == '__main__':
 
     client = MediaRendererClient(coherence)
 
+    from icon import StatusIconController
+    icon = StatusIconController()
+
     def observe():
         print client.__dict__
 
@@ -80,6 +83,7 @@ if __name__ == '__main__':
 
         print "connecting to %s" % device.get_friendly_name()
         client.connect(device)
+        icon.connect(client)
 
         from mmkeys import Mmkeys
         keyer = Mmkeys(client)

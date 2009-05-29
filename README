@@ -1,0 +1,28 @@
+
+UPnPRemoteLet
+=============
+
+A small UPnP Media Renderer remote project using coherence.
+
+Features
+--------
+
+ - control a (upnp) media renderer in your network
+ - small status icon based gui (to select, configure and control)
+ - autoconnect to last connected device
+ - control the renderer with the multimedia keys of your keyboard
+
+
+Dependencies
+------------
+
+ - Python 2.5
+ - gtk >= 2.6
+ - pygtk 
+ - coherence >= 0.5.2
+ - dbus / + python bindings
+ - gconf (used to save the settings)
+
+ # optional
+  - to be able to control the multimedia keys, the GnomeSettingsDaemon is needed
+

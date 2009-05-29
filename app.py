@@ -11,7 +11,7 @@ import gconf
 
 
 gconf_keys = {
-    'udn': '/apps/mupnp/udn',
+    'uuid': '/apps/mupnp/uuid',
     'autoconnect': '/apps/mupnp/autoconnect',
     'mmkeys': '/apps/mupnp/mmkeys',
 }
@@ -20,11 +20,21 @@ gconf_keys = {
 class UpnpRapp(object):
 
     def __init__(self):
+
+        # configuration setup
         self.gconf = gconf.client_get_default()
+        self.conf = {
+            'autoconnect': self.gconf.get_bool(gconf_keys['autoconnect']),
+            'uuid': self.gconf.get_string(gconf_keys['uuid']),
+            'mmkeys': self.gconf.get_bool(gconf_keys['mmkeys']),
+        }
+
+        # coherence setup
         self.coherence = Coherence({'logmode':'warning'})
         self.ctp = ControlPoint(self.coherence,
                 auto_client=['MediaRenderer'])
 
+        # internals setup
         self.client = MediaRendererClient(self.coherence)
 
         self.gui = StatusIconController(self)
@@ -32,10 +42,10 @@ class UpnpRapp(object):
 
         self.mmkeys = MMKeysController(name='MUPnPApp')
         # hack to make it start
-        if True or self.gconf.get_bool(gconf_keys['mmkeys']) is True:
+        if True or self.conf['mmkeys'] is True:
             self.mmkeys.connect(self.client)
 
-
+        # signal connection
         self.ctp.connect(self._renderer_found,
                 'Coherence.UPnP.ControlPoint.MediaRenderer.detected')
 
@@ -48,19 +58,22 @@ class UpnpRapp(object):
         if not device:
             device = self.coherence.get_device_with_id(udn)
 
-        print "connecting to %s" % device.get_friendly_name()
-        self.connect(device)
+        self.gui._new_renderer(device, udn)
+        if not self.client.device and self.conf['autoconnect']:
+            if device.uuid == self.uuid:
+                self.connect(device, udn)
 
     def _renderer_removed(self, device=None, uid=None):
-        pass
+        return
+        self.gui._renderer_removed(device, uid)
 
     def set_autoconnect(self, value):
-        self.gconf.set_boolean(gconf_keys['autoconnect'], value)
+        self.conf['autoconnect'] = value
+        self.gconf.set_bool(gconf_keys['autoconnect'], value)
 
-    def set_multimediakeys(self, value):
-        self.gconf.set_boolean(gconf_keys['mmkeys'], value)
-        self._load_mmkeys = value
-
+    def set_mmkeys(self, value):
+        self.conf['mmkeys'] = value
+        self.gconf.set_bool(gconf_keys['mmkeys'], value)
         # reloading
         if not value:
             self.mmkeys.disconnect()
@@ -68,7 +81,8 @@ class UpnpRapp(object):
             self.mmkeys.connect(self.client)
 
     def connect(self, device):
-        #self.gconf.set_string(gconf_keys['udn'], device)
+        print "connecting to %s" % device.get_friendly_name()
+        self.gconf.set_string(gconf_keys['uuid'], str(device.uuid))
 
         self.client.disconnect()
         self.client.connect(device)

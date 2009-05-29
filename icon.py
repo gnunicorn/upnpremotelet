@@ -15,6 +15,7 @@ class StatusIconController(object):
         self.status_icon.connect('activate', self.show_menu)
 
         self.playing = False
+        self.devices = {}
 
         self._menu_setup()
         self._options_menu_setup()
@@ -38,8 +39,36 @@ class StatusIconController(object):
         self.opt_menu.show_all()
         self.opt_menu.popup(None, None, None, 3, time)
 
-    def _connection_state_changed(self, state):
+    def _device_selected(self, widget, device):
+        print "connecting", widget, device
+        self.app.connect(device)
+
+    def device_found(self, device, udn):
+        if udn in self.devices:
+            return
+
+        device_item = gtk.ImageMenuItem(device.get_friendly_name())
+        device_item.connect('activate', self._device_selected, device)
+        self.devices[udn] = device_item
+        self.devices_menu.append(device_item)
+
+    def device_removed(self, device, udn):
+        try:
+            item = self.devices_menu.pop(udn)
+        except KeyError:
+            pass
+        else:
+            self.devices_menu.remove(item)
+
+    def _connection_state_changed(self, state, device=None):
         self._sensitive_menu(state)
+
+        for item in self.devices.itervalues():
+            item.get_image().clear()
+
+        if state and device:
+            self.devices[device.udn].get_image().set_from_stock(
+                    gtk.STOCK_APPLY, gtk.ICON_SIZE_MENU)
 
     def _sensitive_menu(self, val):
         self.item_play.set_sensitive(val)

@@ -11,7 +11,7 @@ import gconf
 
 
 gconf_keys = {
-    'uuid': '/apps/mupnp/uuid',
+    'udn': '/apps/mupnp/udn',
     'autoconnect': '/apps/mupnp/autoconnect',
     'mmkeys': '/apps/mupnp/mmkeys',
 }
@@ -25,7 +25,7 @@ class UpnpRapp(object):
         self.gconf = gconf.client_get_default()
         self.conf = {
             'autoconnect': self.gconf.get_bool(gconf_keys['autoconnect']),
-            'uuid': self.gconf.get_string(gconf_keys['uuid']),
+            'udn': self.gconf.get_string(gconf_keys['udn']),
             'mmkeys': self.gconf.get_bool(gconf_keys['mmkeys']),
         }
 
@@ -42,7 +42,7 @@ class UpnpRapp(object):
 
         self.mmkeys = MMKeysController(name='MUPnPApp')
         # hack to make it start
-        if True or self.conf['mmkeys'] is True:
+        if True or self.conf['mmkeys']:
             self.mmkeys.connect(self.client)
 
         # signal connection
@@ -58,14 +58,16 @@ class UpnpRapp(object):
         if not device:
             device = self.coherence.get_device_with_id(udn)
 
-        self.gui._new_renderer(device, udn)
+        self.gui.device_found(device, udn)
+        """
         if not self.client.device and self.conf['autoconnect']:
-            if device.uuid == self.uuid:
+            if device.udn == self.conf['udn']:
                 self.connect(device, udn)
+        """
 
     def _renderer_removed(self, device=None, uid=None):
         return
-        self.gui._renderer_removed(device, uid)
+        self.gui.renderer_removed(device, uid)
 
     def set_autoconnect(self, value):
         self.conf['autoconnect'] = value
@@ -82,10 +84,10 @@ class UpnpRapp(object):
 
     def connect(self, device):
         print "connecting to %s" % device.get_friendly_name()
-        self.gconf.set_string(gconf_keys['uuid'], str(device.uuid))
+        self.gconf.set_string(gconf_keys['udn'], str(device.udn))
 
         self.client.disconnect()
         self.client.connect(device)
         # HACK!
-        self.gui._connection_state_changed(True)
+        self.gui._connection_state_changed(True, device)
 

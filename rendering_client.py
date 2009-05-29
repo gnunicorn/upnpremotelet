@@ -26,6 +26,7 @@ class MediaRendererClient(log.Loggable):
     def connect(self, device):
         assert self.device is None, """Don't connect as long as another device is still connected, stupid"""
         self.device = device
+        print "set to", device
         service = self.device.get_service_by_type('RenderingControl')
         service.subscribe_for_variable('Volume',
                 callback=lambda var: setattr(self, 'volume', var.value))

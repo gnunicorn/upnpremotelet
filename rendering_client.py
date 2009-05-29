@@ -43,4 +43,5 @@ class MediaRendererClient(log.Loggable):
         return wrapped
 
     def disconnect(self):
+        # FIXME: unsubscribe
         pass

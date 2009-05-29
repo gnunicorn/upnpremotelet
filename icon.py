@@ -3,7 +3,8 @@ import gtk
 import pygtk
 pygtk.require('2.0')
 
-import time
+# FIXME: add:
+# self.status_icon.set_tooltip()
 
 class StatusIconController(object):
 
@@ -29,11 +30,12 @@ class StatusIconController(object):
 
     def disconnect(self):
         self.controller = None
+        self._sensitive_menu(False)
 
     def show_menu(self, widget):
         # FIXME: what is the time-value to make it show up?
         self.menu.show_all()
-        self.menu.popup(None, None, None, 3, int(time.time()))
+        self.menu.popup(None, None, None, 3, gtk.get_current_event_time())
 
     def show_options(self, widget, button, time):
         self.opt_menu.show_all()
@@ -69,6 +71,8 @@ class StatusIconController(object):
         if state and device:
             self.devices[device.udn].get_image().set_from_stock(
                     gtk.STOCK_APPLY, gtk.ICON_SIZE_MENU)
+            self.status_icon.set_tooltip("Connected to '%s'" %
+                    device.get_friendly_name())
 
     def _sensitive_menu(self, val):
         self.item_play.set_sensitive(val)

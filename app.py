@@ -59,11 +59,9 @@ class UpnpRapp(object):
             device = self.coherence.get_device_with_id(udn)
 
         self.gui.device_found(device, udn)
-        """
         if not self.client.device and self.conf['autoconnect']:
             if device.udn == self.conf['udn']:
-                self.connect(device, udn)
-        """
+                self.connect(device)
 
     def _renderer_removed(self, device=None, uid=None):
         return

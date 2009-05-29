@@ -5,7 +5,7 @@ if __name__ == '__main__':
     from twisted.internet import reactor
     import dbus.glib
 
-    from app import UpnpRapp
+    from upnpremotelet.app import UpnpRapp
 
     r = UpnpRapp()
 

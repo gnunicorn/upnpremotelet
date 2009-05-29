@@ -7,16 +7,6 @@ import time
 
 class StatusIconController(object):
 
-    def show_menu(self, widget):
-        # FIXME: what is the time-value to make it show up?
-        self.menu.show_all()
-        self.menu.popup(None, None, None, 3, int(time.time()))
-
-    def show_options(self, widget, button, time):
-        #self.show_menu(widget)
-        self.opt_menu.show_all()
-        self.opt_menu.popup(None, None, None, 3, time)
-
     def __init__(self, app):
         self.app = app
         self.status_icon = gtk.StatusIcon()
@@ -39,6 +29,15 @@ class StatusIconController(object):
     def disconnect(self):
         self.controller = None
 
+    def show_menu(self, widget):
+        # FIXME: what is the time-value to make it show up?
+        self.menu.show_all()
+        self.menu.popup(None, None, None, 3, int(time.time()))
+
+    def show_options(self, widget, button, time):
+        self.opt_menu.show_all()
+        self.opt_menu.popup(None, None, None, 3, time)
+
     def _connection_state_changed(self, state):
         self._sensitive_menu(state)
 
@@ -47,7 +46,6 @@ class StatusIconController(object):
         self.item_stop.set_sensitive(val)
         self.item_next.set_sensitive(val)
         self.item_prev.set_sensitive(val)
-
 
     def _set_playing_status(self, playing):
         if playing != self.playing:
@@ -62,6 +60,12 @@ class StatusIconController(object):
 
     def _wrapped(self, widget, method):
         getattr(self.controller, method)()
+
+    def _autoconnect_toggle(self, widget):
+        self.app.set_autoconnect(widget.get_active())
+
+    def _mmkeys_toggle(self, widget):
+        self.app.set_mmkeys(widget.get_active())
 
     def _menu_setup(self):
         self.menu = gtk.Menu()
@@ -78,12 +82,6 @@ class StatusIconController(object):
         self.menu.append(self.item_prev)
         self.menu.append(self.item_next)
         self.menu.append(self.item_play)
-
-    def _autoconnect_toggle(self, widget):
-        self.app.set_autoconnect(widget.get_active())
-
-    def _mmkeys_toggle(self, widget):
-        self.app.set_mmkeys(widget.get_active())
 
     def _options_menu_setup(self):
         self.opt_menu = gtk.Menu()
@@ -103,7 +101,6 @@ class StatusIconController(object):
         self.opt_menu.append(autoconnect_item)
         self.opt_menu.append(mmkeys_item)
         self.opt_menu.append(players_item)
-
 
 
 if __name__ == '__main__':

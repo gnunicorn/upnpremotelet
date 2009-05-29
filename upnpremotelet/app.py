@@ -3,9 +3,9 @@
 from coherence.base import Coherence
 from coherence.upnp.devices.control_point import ControlPoint
 
-from icon import StatusIconController
-from mmkeys import MMKeysController
-from rendering_client import MediaRendererClient
+from upnpremotelet.status_icon_controller import StatusIconController
+from upnpremotelet.mmkeys_controller import MMKeysController
+from upnpremotelet.media_renderer_client import MediaRendererClient
 
 import gconf
 

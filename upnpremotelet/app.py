@@ -8,6 +8,7 @@ from upnpremotelet.mmkeys_controller import MMKeysController
 from upnpremotelet.media_renderer_client import MediaRendererClient
 
 import gconf
+import sys
 
 
 gconf_keys = {
@@ -79,6 +80,10 @@ class UpnpRapp(object):
             self.mmkeys.disconnect()
         else:
             self.mmkeys.connect(self.client)
+
+    def quit(self, value=0):
+        # FIXME: we should disconnect and stuff here
+        sys.exit(value)
 
     def connect(self, device):
         print "connecting to %s" % device.get_friendly_name()

@@ -33,7 +33,6 @@ class StatusIconController(object):
         self._sensitive_menu(False)
 
     def show_menu(self, widget):
-        # FIXME: what is the time-value to make it show up?
         self.menu.show_all()
         self.menu.popup(None, None, None, 3, gtk.get_current_event_time())
 
@@ -102,6 +101,10 @@ class StatusIconController(object):
 
     def _menu_setup(self):
         self.menu = gtk.Menu()
+
+        item_quit = gtk.ImageMenuItem(gtk.STOCK_QUIT)
+        item_quit.connect('activate', self._quit)
+
         self.item_play = gtk.ImageMenuItem(gtk.STOCK_MEDIA_PLAY)
         self.item_play.connect('activate', self._toggle_playing)
         self.item_stop = gtk.ImageMenuItem(gtk.STOCK_MEDIA_STOP)
@@ -111,10 +114,17 @@ class StatusIconController(object):
         self.item_prev = gtk.ImageMenuItem(gtk.STOCK_MEDIA_PREVIOUS)
         self.item_prev.connect('activate', self._wrapped, 'previous')
 
+        separator = gtk.SeparatorMenuItem()
+
+        self.menu.append(item_quit)
+        self.menu.append(separator)
         self.menu.append(self.item_stop)
         self.menu.append(self.item_prev)
         self.menu.append(self.item_next)
         self.menu.append(self.item_play)
+
+    def _quit(self, *args):
+        self.app.quit()
 
     def _options_menu_setup(self):
         self.opt_menu = gtk.Menu()
@@ -131,11 +141,15 @@ class StatusIconController(object):
         players_item = gtk.MenuItem("select player")
         players_item.set_submenu(self.devices_menu)
 
+        separator = gtk.SeparatorMenuItem()
+
+        self.opt_menu.append(players_item)
+        self.opt_menu.append(separator)
         self.opt_menu.append(autoconnect_item)
         self.opt_menu.append(mmkeys_item)
-        self.opt_menu.append(players_item)
-
 
 if __name__ == '__main__':
-    st = StatusIconController()
+    class DummyApp(object):
+        conf = {'autoconnect': False, 'mmkeys': False}
+    st = StatusIconController(DummyApp())
     gtk.main()

@@ -53,7 +53,7 @@ class UpnpRapp(object):
         self.ctp.connect(self._renderer_removed,
                 'Coherence.UPnP.ControlPoint.MediaRenderer.removed')
 
-    def _renderer_found(self, device=None, udn=None):
+    def _renderer_found(self, device=None, udn=None, client=None):
         # FIXME: take care about the auto connect if not connected yet
         # instead of just connecting
         if not device:
@@ -64,9 +64,9 @@ class UpnpRapp(object):
             if device.udn == self.conf['udn']:
                 self.connect(device)
 
-    def _renderer_removed(self, device=None, uid=None):
+    def _renderer_removed(self, device=None, udn=None):
         return
-        self.gui.renderer_removed(device, uid)
+        self.gui.renderer_removed(device, udn)
 
     def set_autoconnect(self, value):
         self.conf['autoconnect'] = value
